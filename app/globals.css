@@ -1,0 +1,27 @@
+@layer theme, base, antd, components, utilities;
+@import "tailwindcss";
+
+:root {
+  --font-body: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", "Inter Variable", system-ui, sans-serif;
+  --brand: #7e22ce;
+  --brand-dark: #6b21a8;
+  --brand-soft: #faf5ff;
+  --brand-line: #e9d5ff;
+  --ink: #1e1b2e;
+  --muted: #6b6880;
+  --page: #f6f4fb;
+}
+
+html, body { background: var(--page); color: var(--ink); }
+body { font-family: var(--font-body); -webkit-font-smoothing: antialiased; font-feature-settings: "cv11", "ss01"; }
+h1, h2, h3, h4, h5 { font-family: var(--font-display); letter-spacing: -0.01em; }
+
+.num { font-variant-numeric: tabular-nums; }
+
+/* Invoice paper preview */
+.paper { box-shadow: 0 1px 2px rgba(30,27,46,.06), 0 12px 40px rgba(30,27,46,.12); }
+
+/* Slim scrollbars inside drawers */
+.ant-drawer-body::-webkit-scrollbar { width: 8px; }
+.ant-drawer-body::-webkit-scrollbar-thumb { background: #d8cdea; border-radius: 8px; }

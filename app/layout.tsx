@@ -6,8 +6,8 @@ import Providers from "@/components/layout/Providers";
 import AppShell from "@/components/layout/AppShell";
 
 export const metadata: Metadata = {
-  title: "Billbook — GST Invoice Generator",
-  description: "Create professional GST invoices, preview them on A4 and download as PDF or Excel. Runs entirely in your browser.",
+  title: "Invoice & Bill Generator",
+  description: "Create professional invoices, estimates, and bills of any kind. Preview on A4 and download as PDF or Excel. Runs entirely in your browser.",
 };
 
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#7e22ce" };

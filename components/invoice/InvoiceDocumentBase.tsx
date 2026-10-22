@@ -1,6 +1,6 @@
 "use client";
 
-import { CSSProperties, ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Invoice } from "@/types/invoice";
 import { buildHsnSummary } from "@/lib/invoice/calculations";
 import { amountToWords } from "@/lib/invoice/amountToWords";
@@ -16,21 +16,6 @@ import {
   PAGE_PADDING_X,
   paginateInvoice,
 } from "@/lib/invoice/paginate";
-
-/* ------------------------------------------------------------------
-   One professional purple theme. Plain hex values on purpose so the
-   PDF capture renders identically everywhere.
-------------------------------------------------------------------- */
-const C = {
-  brand: "#7e22ce",
-  brandDark: "#581c87",
-  soft: "#faf5ff",
-  line: "#e9d5ff",
-  rule: "#ece6f5",
-  ink: "#1e1b2e",
-  body: "#403d52",
-  muted: "#7a7691",
-};
 
 const FONT = `"Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`;
 const DISPLAY = `"Plus Jakarta Sans Variable", "Plus Jakarta Sans", ${FONT}`;
@@ -99,7 +84,7 @@ export default function InvoiceDocumentBase({ invoice, idPrefix = "invoice" }: P
           {page.items.length > 0 && <ItemsTable invoice={invoice} page={page} />}
           {page.showClosing && <Closing invoice={invoice} />}
           {page.showHsn && <HsnSummary invoice={invoice} />}
-          <Footer invoice={invoice} page={page.number} total={pages.length} />
+          {/* <Footer invoice={invoice} page={page.number} total={pages.length} /> */}
         </Sheet>
       ))}
 
@@ -107,16 +92,17 @@ export default function InvoiceDocumentBase({ invoice, idPrefix = "invoice" }: P
       <div
         ref={measurerRef}
         aria-hidden
-        style={{ position: "absolute", left: -99999, top: 0, width: CONTENT_WIDTH_PX, visibility: "hidden", pointerEvents: "none", fontFamily: FONT, fontSize: 11, lineHeight: 1.45 }}
+        className="absolute -left-[99999px] top-0 invisible pointer-events-none text-[11px] leading-[1.45]"
+        style={{ width: CONTENT_WIDTH_PX, fontFamily: FONT }}
       >
-        <div data-block="header" style={{ display: "flow-root" }}>
+        <div data-block="header" className="flow-root">
           <FirstHeader invoice={invoice} />
         </div>
         <ItemsTable invoice={invoice} page={all} />
-        <div data-block="closing" style={{ display: "flow-root" }}>
+        <div data-block="closing" className="flow-root">
           <Closing invoice={invoice} />
         </div>
-        <div data-block="hsn" style={{ display: "flow-root" }}>
+        <div data-block="hsn" className="flow-root">
           <HsnSummary invoice={invoice} />
         </div>
       </div>
@@ -130,24 +116,16 @@ function Sheet({ id, children }: { id: string; children: ReactNode }) {
   return (
     <div
       id={id}
-      className="invoice-sheet"
+      className="invoice-sheet relative bg-white text-[#403d52] text-[11px] leading-[1.45] overflow-hidden box-border shrink-0"
       style={{
-        position: "relative",
         width: A4_WIDTH_PX,
         height: A4_HEIGHT_PX,
         padding: `${PAGE_PADDING_TOP}px ${PAGE_PADDING_X}px ${PAGE_FOOTER_PX}px`,
-        background: "#fff",
-        color: C.body,
         fontFamily: FONT,
-        fontSize: 11,
-        lineHeight: 1.45,
-        overflow: "hidden",
-        boxSizing: "border-box",
-        flexShrink: 0,
       }}
     >
       {/* brand bar */}
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 6, background: C.brand }} />
+      <div className="absolute top-0 left-0 right-0 h-[6px] bg-[#7e22ce]" />
       {children}
     </div>
   );
@@ -157,22 +135,22 @@ function FirstHeader({ invoice }: { invoice: Invoice }) {
   const { business: b, customer: c } = invoice;
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 24, minHeight: 96 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 14, minWidth: 0 }}>
+      <div className="flex justify-between items-start gap-6 min-h-[96px]">
+        <div className="flex items-center gap-[14px] min-w-0">
           {b.logoDataUrl && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={b.logoDataUrl} alt="" style={{ height: 56, maxWidth: 120, objectFit: "contain" }} />
+            <img src={b.logoDataUrl} alt="" className="h-[56px] max-w-[120px] object-contain" />
           )}
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontFamily: DISPLAY, fontSize: 22, fontWeight: 800, color: C.brand, lineHeight: 1.15, letterSpacing: "-0.01em" }}>
+          <div className="min-w-0">
+            <div className="text-[22px] font-extrabold text-[#7e22ce] leading-[1.15] tracking-[-0.01em]" style={{ fontFamily: DISPLAY }}>
               {b.businessName || "Your Business Name"}
             </div>
           </div>
         </div>
 
-        <div style={{ textAlign: "right", flexShrink: 0 }}>
-          <div style={{ fontFamily: DISPLAY, fontSize: 11, fontWeight: 800, letterSpacing: "0.22em", color: C.muted }}>TAX INVOICE</div>
-          <div style={{ marginTop: 8, display: "grid", gridTemplateColumns: "auto auto", columnGap: 14, rowGap: 3, justifyContent: "end", textAlign: "right" }}>
+       <div className="text-left shrink-0">
+          <div className="text-[11px] font-extrabold tracking-[0.22em] text-[#7a7691]" style={{ fontFamily: DISPLAY }}>TAX INVOICE</div>
+          <div className="mt-2 grid grid-cols-[auto_auto] gap-x-4 row-gap-[3px] justify-end text-left">
             <Meta k="Invoice No" v={invoice.invoiceNumber || "—"} strong />
             <Meta k="Invoice Date" v={formatDate(invoice.invoiceDate) || "—"} />
             {invoice.dueDate && <Meta k="Due Date" v={formatDate(invoice.dueDate)} />}
@@ -181,11 +159,16 @@ function FirstHeader({ invoice }: { invoice: Invoice }) {
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: 14, marginTop: 22 }}>
+      <div className="flex gap-[14px] my-[22px]">
         <PartyCard
           title="Billed By"
           name={b.businessName}
-          address={[b.addressLine1, b.addressLine2, `${b.city}, ${b.state}, ${b.country} - ${b.pincode}`]}
+          address={[
+            b.addressLine1,
+            b.addressLine2,
+            [b.city, b.state, b.country].filter(Boolean).join(", "),
+            b.pincode,
+          ]}
           rows={[
             ["GSTIN", b.gstin],
             ["PAN", b.pan],
@@ -197,7 +180,12 @@ function FirstHeader({ invoice }: { invoice: Invoice }) {
         <PartyCard
           title="Billed To"
           name={c.customerName}
-          address={[c.addressLine1, c.addressLine2, `${c.city}, ${c.state}, ${c.country} - ${c.pincode}`]}
+          address={[
+            c.addressLine1,
+            c.addressLine2,
+            [c.city, c.state, c.country].filter(Boolean).join(", "),
+            c.pincode,
+          ]}
           rows={[
             ["GSTIN", c.gstin],
             ["PAN", c.pan],
@@ -207,7 +195,7 @@ function FirstHeader({ invoice }: { invoice: Invoice }) {
         />
       </div>
 
-      <div style={{ display: "flex", justifyContent: "space-between", margin: "14px 2px 18px", fontSize: 11 }}>
+      {/* <div style={{ display: "flex", justifyContent: "space-between", margin: "14px 2px 18px", fontSize: 11 }}>
         <span>
           <span style={{ color: C.muted }}>Country of Supply: </span>
           <strong style={{ color: C.ink }}>{invoice.countryOfSupply || "—"}</strong>
@@ -219,17 +207,17 @@ function FirstHeader({ invoice }: { invoice: Invoice }) {
             {invoice.placeOfSupplyCode ? ` (${invoice.placeOfSupplyCode})` : ""}
           </strong>
         </span>
-      </div>
+      </div> */}
     </div>
   );
 }
 
 function ContinuedHeader({ invoice }: { invoice: Invoice }) {
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", height: 34, fontSize: 11 }}>
-      <span style={{ fontFamily: DISPLAY, fontWeight: 800, color: C.brand, fontSize: 13 }}>{invoice.business.businessName}</span>
-      <span style={{ color: C.muted }}>
-        Invoice <strong style={{ color: C.ink }}>{invoice.invoiceNumber}</strong> · continued
+    <div className="flex justify-between items-baseline h-[34px] text-[11px]">
+      <span className="font-extrabold text-[#7e22ce] text-[13px]" style={{ fontFamily: DISPLAY }}>{invoice.business.businessName}</span>
+      <span className="text-[#7a7691]">
+        Invoice <strong className="text-[#1e1b2e]">{invoice.invoiceNumber}</strong> · continued
       </span>
     </div>
   );
@@ -238,8 +226,8 @@ function ContinuedHeader({ invoice }: { invoice: Invoice }) {
 function Meta({ k, v, strong }: { k: string; v: string; strong?: boolean }) {
   return (
     <>
-      <span style={{ color: C.muted }}>{k}</span>
-      <span style={{ color: C.ink, fontWeight: strong ? 800 : 600 }}>{v}</span>
+      <span className="text-[#7a7691]">{k}</span>
+      <span className={`text-[#1e1b2e] ${strong ? "font-extrabold" : "font-semibold"}`}>{v}</span>
     </>
   );
 }
@@ -256,21 +244,21 @@ function PartyCard({
   rows: [string, string | undefined][];
 }) {
   return (
-    <div style={{ flex: 1, minWidth: 0, background: C.soft, border: `1px solid ${C.line}`, borderRadius: 12, padding: "14px 16px" }}>
-      <div style={{ fontFamily: DISPLAY, fontSize: 12.5, fontWeight: 800, color: C.brand, marginBottom: 8 }}>{title}</div>
-      <div style={{ fontSize: 12, fontWeight: 700, color: C.ink, marginBottom: 3 }}>{name || "—"}</div>
-      <div style={{ color: C.body }}>
+    <div className="flex-1 min-w-0 bg-[#faf5ff] border border-[#e9d5ff] rounded-xl p-[14px_16px]">
+      <div className="text-[12.5px] font-extrabold text-[#7e22ce] mb-2" style={{ fontFamily: DISPLAY }}>{title}</div>
+      <div className="text-[12px] font-bold text-[#1e1b2e] mb-[3px]">{name || "—"}</div>
+      <div className="text-[#403d52]">
         {address.filter(Boolean).map((l, i) => (
           <div key={i}>{l}</div>
         ))}
       </div>
-      <div style={{ marginTop: 6 }}>
+      <div className="mt-[6px]">
         {rows
           .filter(([, v]) => !!v)
           .map(([k, v]) => (
             <div key={k}>
-              <span style={{ color: C.muted }}>{k}: </span>
-              <span style={{ color: C.ink, fontWeight: 600 }}>{v}</span>
+              <span className="text-[#7a7691]">{k}: </span>
+              <span className="text-[#1e1b2e] font-semibold">{v}</span>
             </div>
           ))}
       </div>
@@ -280,70 +268,77 @@ function PartyCard({
 
 /* ------------------------------ items ------------------------------ */
 
-const th: CSSProperties = { padding: "9px 8px", fontWeight: 700, fontSize: 10.5, color: "#fff", whiteSpace: "nowrap" };
-const td: CSSProperties = { padding: "10px 8px", verticalAlign: "top", borderBottom: `1px solid ${C.rule}` };
+const thClass = "p-[9px_8px] font-bold text-[10.5px] text-white whitespace-nowrap";
+const tdClass = "p-[10px_8px] vertical-top border-b border-[#ece6f5]";
 
 function ItemsTable({ invoice, page }: { invoice: Invoice; page: InvoicePage }) {
   const igst = invoice.taxMode === "IGST";
   const cur = invoice.currency;
   return (
-    <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0, tableLayout: "fixed" }}>
+    <table className="w-full border-separate border-spacing-0 table-fixed">
       <colgroup>
-        <col style={{ width: 26 }} />
-        <col />
-        <col style={{ width: 40 }} />
-        <col style={{ width: 62 }} />
-        <col style={{ width: 70 }} />
-        <col style={{ width: 80 }} />
-        {igst ? <col style={{ width: 74 }} /> : <><col style={{ width: 62 }} /><col style={{ width: 62 }} /></>}
-        <col style={{ width: 84 }} />
+        <col className="w-[6%]" />
+        <col className="w-[40%]" />
+        <col className="w-[9%]" />
+        {/* <col /> */}
+        <col className="w-[11%]" />
+        <col className="w-[12%]" />
+        {igst ? (
+          <col className="w-[12%]" />
+        ) : (
+          <>
+            <col className="w-[10%]" />
+            <col className="w-[10%]" />
+          </>
+        )}
+        <col className="w-[14%]" />
       </colgroup>
       <thead data-block="thead">
-        <tr style={{ background: C.brand }}>
-          <th style={{ ...th, textAlign: "left", borderTopLeftRadius: 8, borderBottomLeftRadius: 8 }}>#</th>
-          <th style={{ ...th, textAlign: "left" }}>Item</th>
-          <th style={{ ...th, textAlign: "right" }}>GST</th>
-          <th style={{ ...th, textAlign: "right" }}>Qty</th>
-          <th style={{ ...th, textAlign: "right" }}>Rate</th>
-          <th style={{ ...th, textAlign: "right" }}>Amount</th>
+        <tr className="bg-[#7e22ce]">
+          <th className={`${thClass} text-left rounded-tl-lg rounded-bl-lg`}>Sr.No</th>
+          <th className={`${thClass} text-left`}>Item</th>
+          <th className={`${thClass} text-right`}>GST</th>
+          {/* <th style={{ ...th, textAlign: "right" }}>Qty</th> */}
+          <th className={`${thClass} text-right`}>Rate</th>
+          <th className={`${thClass} text-right`}>Discount</th>
           {igst ? (
-            <th style={{ ...th, textAlign: "right" }}>IGST</th>
+            <th className={`${thClass} text-right`}>IGST</th>
           ) : (
             <>
-              <th style={{ ...th, textAlign: "right" }}>CGST</th>
-              <th style={{ ...th, textAlign: "right" }}>SGST</th>
+              <th className={`${thClass} text-right`}>CGST</th>
+              <th className={`${thClass} text-right`}>SGST</th>
             </>
           )}
-          <th style={{ ...th, textAlign: "right", borderTopRightRadius: 8, borderBottomRightRadius: 8 }}>Total</th>
+          <th className={`${thClass} text-right rounded-tr-lg rounded-br-lg`}>Total</th>
         </tr>
       </thead>
       <tbody>
         {page.items.map((item, i) => (
           <tr key={item.id} data-row-id={item.id}>
-            <td style={{ ...td, color: C.muted }}>{page.startIndex + i + 1}</td>
-            <td style={td}>
-              <div style={{ fontWeight: 700, color: C.ink, fontSize: 11.5 }}>{item.itemName || "Untitled item"}</div>
-              {item.hsnSac && <div style={{ color: C.muted, fontSize: 10 }}>HSN/SAC: {item.hsnSac}</div>}
-              {item.description && <div style={{ color: C.body, fontSize: 10.5, whiteSpace: "pre-line" }}>{item.description}</div>}
+            <td className={`${tdClass} text-[#7a7691]`}>{page.startIndex + i + 1}</td>
+            <td className={tdClass}>
+              <div className="font-bold text-[#1e1b2e] text-[11.5px]">{item.itemName || "Untitled item"}</div>
+              {item.hsnSac && <div className="text-[#7a7691] text-[10px]">HSN/SAC: {item.hsnSac}</div>}
+              {item.description && <div className="text-[#403d52] text-[10.5px] whitespace-pre-line">{item.description}</div>}
             </td>
-            <td style={{ ...td, textAlign: "right" }}>{item.gstRate}%</td>
-            <td style={{ ...td, textAlign: "right" }}>
+            <td className={`${tdClass} text-right`}>{item.gstRate}%</td>
+            {/* <td style={{ ...td, textAlign: "right" }}>
               {item.quantity} <span style={{ color: C.muted, fontSize: 9.5 }}>{item.unit}</span>
-            </td>
-            <td style={{ ...td, textAlign: "right" }}>{formatAmount(item.rate, cur)}</td>
-            <td style={{ ...td, textAlign: "right" }}>
+            </td> */}
+            <td className={`${tdClass} text-right`}>{formatAmount(item.rate, cur)}</td>
+            <td className={`${tdClass} text-right`}>
               {formatAmount(item.taxableAmount, cur)}
-              {item.discountAmount > 0 && <div style={{ color: C.muted, fontSize: 9.5 }}>− {formatAmount(item.discountAmount, cur)} disc.</div>}
+              {/* {item.discountAmount > 0 && <div style={{ color: C.muted, fontSize: 9.5 }}>− {formatAmount(item.discountAmount, cur)} disc.</div>} */}
             </td>
             {igst ? (
-              <td style={{ ...td, textAlign: "right" }}>{formatAmount(item.igst, cur)}</td>
+              <td className={`${tdClass} text-right`}>{formatAmount(item.igst, cur)}</td>
             ) : (
               <>
-                <td style={{ ...td, textAlign: "right" }}>{formatAmount(item.cgst, cur)}</td>
-                <td style={{ ...td, textAlign: "right" }}>{formatAmount(item.sgst, cur)}</td>
+                <td className={`${tdClass} text-right`}>{formatAmount(item.cgst, cur)}</td>
+                <td className={`${tdClass} text-right`}>{formatAmount(item.sgst, cur)}</td>
               </>
             )}
-            <td style={{ ...td, textAlign: "right", fontWeight: 700, color: C.ink }}>{formatAmount(item.total, cur)}</td>
+            <td className={`${tdClass} text-right font-bold text-[#1e1b2e]`}>{formatAmount(item.total, cur)}</td>
           </tr>
         ))}
       </tbody>
@@ -360,14 +355,15 @@ function Closing({ invoice }: { invoice: Invoice }) {
   const termLines = (invoice.terms ?? "").split("\n").map((l) => l.trim()).filter(Boolean);
 
   return (
-    <div style={{ marginTop: 24 }}>
-      <div style={{ display: "flex", gap: 22, alignItems: "flex-start" }}>
-        <div style={{ flex: 1, minWidth: 0, paddingTop: 4 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", color: C.muted }}>TOTAL (IN WORDS)</div>
-          <div style={{ marginTop: 5, fontWeight: 700, color: C.ink, fontSize: 11.5, lineHeight: 1.5 }}>{invoice.amountInWords}</div>
+    <div className="mt-6">
+      <div className="flex gap-[22px] items-start">
+        <div className="flex-1 min-w-0 pt-1">
+          <div className="text-[10px] font-bold tracking-[0.12em] text-[#7a7691]">TOTAL (IN WORDS)</div>
+          <div className="mt-[5px] font-bold text-[#1e1b2e] text-[11.5px] leading-[1.5]">{invoice.amountInWords}</div>
         </div>
 
-        <div style={{ width: 270, flexShrink: 0, background: C.soft, border: `1px solid ${C.line}`, borderRadius: 12, padding: "12px 16px" }}>
+        <div className="w-[270px] shrink-0 bg-[#faf5ff] border border-[#e9d5ff] rounded-xl p-[12px_16px]">
+          <TotalRow label="Sub Total Amount" value={formatCurrency(invoice.subtotal, cur)} />
           <TotalRow label="Taxable Amount" value={formatCurrency(invoice.taxableAmount, cur)} />
           {invoice.totalDiscount > 0 && <TotalRow label="Discount" value={`− ${formatCurrency(invoice.totalDiscount, cur)}`} />}
           {igst ? (
@@ -378,19 +374,13 @@ function Closing({ invoice }: { invoice: Invoice }) {
               <TotalRow label="SGST" value={formatCurrency(invoice.sgst, cur)} />
             </>
           )}
-          {invoice.roundOffEnabled && <TotalRow label="Round Off" value={formatCurrency(invoice.roundOff, cur)} />}
-          <div style={{ height: 1, background: C.line, margin: "8px 0 10px" }} />
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-            <span style={{ fontFamily: DISPLAY, fontWeight: 800, color: C.brandDark, fontSize: 12 }}>Grand Total</span>
+          {/* {invoice.roundOffEnabled && <TotalRow label="Round Off" value={formatCurrency(invoice.roundOff, cur)} />} */}
+          <div className="h-[1px] bg-[#e9d5ff] my-[8px_10px]" />
+          <div className="flex justify-between items-baseline">
+            <span className="font-extrabold text-[#581c87] text-[12px]" style={{ fontFamily: DISPLAY }}>Total Amount</span>
             <span
-              style={{
-                fontFamily: DISPLAY,
-                fontWeight: 800,
-                fontSize: 17,
-                color: C.brand,
-                paddingBottom: 2,
-                borderBottom: `4px double ${C.brand}`,
-              }}
+              className="font-extrabold text-[17px] text-[#7e22ce] pb-[2px] border-b-[4px] border-double border-[#7e22ce]"
+              style={{ fontFamily: DISPLAY }}
             >
               {formatCurrency(invoice.grandTotal, cur)}
             </span>
@@ -399,20 +389,20 @@ function Closing({ invoice }: { invoice: Invoice }) {
       </div>
 
       {(invoice.notes || termLines.length > 0) && (
-        <div style={{ display: "flex", gap: 24, marginTop: 20 }}>
-          {invoice.notes && (
+        <div className="flex gap-6 mt-[20px]">
+          {/* {invoice.notes && (
             <div style={{ flex: 1, minWidth: 0 }}>
               <SmallTitle>Notes</SmallTitle>
               <div style={{ whiteSpace: "pre-line", fontSize: 10.5 }}>{invoice.notes}</div>
             </div>
-          )}
+          )} */}
           {termLines.length > 0 && (
-            <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="flex-1 min-w-0">
               <SmallTitle>Terms &amp; Conditions</SmallTitle>
-              <div style={{ fontSize: 10.5 }}>
+              <div className="text-[10.5px]">
                 {termLines.map((l, i) => (
-                  <div key={i} style={{ display: "flex", gap: 6 }}>
-                    <span style={{ color: C.brand, fontWeight: 700 }}>{i + 1}.</span>
+                  <div key={i} className="flex gap-[6px]">
+                    <span className="text-[#7e22ce] font-extrabold">{i + 1}.</span>
                     <span>{l}</span>
                   </div>
                 ))}
@@ -423,10 +413,10 @@ function Closing({ invoice }: { invoice: Invoice }) {
       )}
 
       {pay?.enabled && (
-        <div style={{ display: "flex", gap: 18, alignItems: "center", marginTop: 20, border: `1px solid ${C.line}`, borderRadius: 12, padding: "12px 16px" }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="flex gap-[18px] items-center mt-[20px] border border-[#e9d5ff] rounded-xl p-[12px_16px]">
+          <div className="flex-1 min-w-0">
             <SmallTitle>Payment Details</SmallTitle>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: 18, rowGap: 2, fontSize: 10.5 }}>
+            <div className="grid grid-cols-2 col-gap-[18px] row-gap-[2px] text-[10.5px]">
               {(
                 [
                   ["Account Name", pay.accountHolderName],
@@ -440,32 +430,32 @@ function Closing({ invoice }: { invoice: Invoice }) {
                 .filter(([, v]) => !!v)
                 .map(([k, v]) => (
                   <div key={k}>
-                    <span style={{ color: C.muted }}>{k}: </span>
-                    <strong style={{ color: C.ink }}>{v}</strong>
+                    <span className="text-[#7a7691]">{k}: </span>
+                    <strong className="text-[#1e1b2e]">{v}</strong>
                   </div>
                 ))}
             </div>
           </div>
           {pay.upiQrDataUrl && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={pay.upiQrDataUrl} alt="UPI QR" style={{ width: 72, height: 72, objectFit: "contain" }} />
+            <img src={pay.upiQrDataUrl} alt="UPI QR" className="w-[72px] h-[72px] object-contain" />
           )}
         </div>
       )}
 
       {invoice.signature?.enabled && (
-        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 26 }}>
-          <div style={{ width: 190, textAlign: "center" }}>
-            <div style={{ height: 58, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+        <div className="flex justify-end mt-[26px]">
+          <div className="w-[190px] text-center">
+            <div className="h-[58px] flex items-end justify-center">
               {invoice.signature.signatureImageDataUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={invoice.signature.signatureImageDataUrl} alt="" style={{ maxHeight: 54, maxWidth: 170, objectFit: "contain" }} />
+                <img src={invoice.signature.signatureImageDataUrl} alt="" className="max-h-[54px] max-w-[170px] object-contain" />
               )}
             </div>
-            <div style={{ borderTop: `1px solid ${C.ink}`, paddingTop: 5, fontWeight: 700, color: C.ink, fontSize: 11 }}>
+            <div className="border-t border-[#1e1b2e] pt-[5px] font-bold text-[#1e1b2e] text-[11px]">
               {invoice.signature.authorisedSignatoryName || "Authorised Signatory"}
             </div>
-            <div style={{ color: C.muted, fontSize: 9.5 }}>Authorised Signatory</div>
+            <div className="text-[#7a7691] text-[9.5px]">Authorised Signatory</div>
           </div>
         </div>
       )}
@@ -475,15 +465,15 @@ function Closing({ invoice }: { invoice: Invoice }) {
 
 function TotalRow({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", padding: "2.5px 0", fontSize: 11 }}>
-      <span style={{ color: C.muted }}>{label}</span>
-      <span style={{ color: C.ink, fontWeight: 600 }}>{value}</span>
+    <div className="flex justify-between p-[2.5px_0] text-[11px]">
+      <span className="text-[#7a7691]">{label}</span>
+      <span className="text-[#1e1b2e] font-semibold">{value}</span>
     </div>
   );
 }
 
 function SmallTitle({ children }: { children: ReactNode }) {
-  return <div style={{ fontFamily: DISPLAY, fontSize: 11.5, fontWeight: 800, color: C.brand, marginBottom: 5 }}>{children}</div>;
+  return <div className="text-[11.5px] font-extrabold text-[#7e22ce] mb-[5px]" style={{ fontFamily: DISPLAY }}>{children}</div>;
 }
 
 /* ------------------------------ HSN summary ------------------------------ */
@@ -492,78 +482,78 @@ function HsnSummary({ invoice }: { invoice: Invoice }) {
   const rows = buildHsnSummary(invoice.items);
   const igst = invoice.taxMode === "IGST";
   const cur = invoice.currency;
-  const h: CSSProperties = { padding: "8px 8px", fontSize: 10, fontWeight: 700, color: C.brandDark, background: C.soft, textAlign: "right", borderBottom: `1px solid ${C.line}` };
-  const d: CSSProperties = { padding: "8px 8px", textAlign: "right", borderBottom: `1px solid ${C.rule}` };
+  const hClass = "p-[8px_8px] text-[10px] font-bold text-[#581c87] bg-[#faf5ff] text-right border-b border-[#e9d5ff]";
+  const dClass = "p-[8px_8px] text-right border-b border-[#ece6f5]";
   const totalTax = invoice.cgst + invoice.sgst + invoice.igst;
 
   return (
-    <div style={{ marginTop: 28 }}>
-      <div style={{ fontFamily: DISPLAY, fontSize: 13, fontWeight: 800, color: C.brand, marginBottom: 10 }}>HSN / SAC Tax Summary</div>
-      <table style={{ width: "100%", borderCollapse: "collapse", border: `1px solid ${C.line}` }}>
+    <div className="mt-[28px]">
+      <div className="text-[13px] font-black text-[#7e22ce] mb-[10px]" style={{ fontFamily: DISPLAY }}>Tax Summary</div>
+      <table className="w-full border-collapse border border-[#e9d5ff]">
         <thead>
           <tr>
-            <th style={{ ...h, textAlign: "left" }}>HSN/SAC</th>
-            <th style={h}>Taxable Value</th>
+            <th className={`${hClass} text-left`}>HSN/SAC</th>
+            <th className={hClass}>Taxable Value</th>
             {igst ? (
               <>
-                <th style={h}>IGST Rate</th>
-                <th style={h}>IGST Amount</th>
+                <th className={hClass}>IGST Rate</th>
+                <th className={hClass}>IGST Amount</th>
               </>
             ) : (
               <>
-                <th style={h}>CGST Rate</th>
-                <th style={h}>CGST Amount</th>
-                <th style={h}>SGST Rate</th>
-                <th style={h}>SGST Amount</th>
+                <th className={hClass}>CGST Rate</th>
+                <th className={hClass}>CGST Amount</th>
+                <th className={hClass}>SGST Rate</th>
+                <th className={hClass}>SGST Amount</th>
               </>
             )}
-            <th style={h}>Total Tax</th>
+            <th className={hClass}>Total Tax</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r) => (
             <tr key={`${r.hsnSac}-${r.cgstRate}-${r.igstRate}`}>
-              <td style={{ ...d, textAlign: "left", fontWeight: 600 }}>{r.hsnSac}</td>
-              <td style={d}>{formatAmount(r.taxableValue, cur)}</td>
+              <td className={`${dClass} text-left font-semibold`}>{r.hsnSac}</td>
+              <td className={dClass}>{formatAmount(r.taxableValue, cur)}</td>
               {igst ? (
                 <>
-                  <td style={d}>{r.igstRate}%</td>
-                  <td style={d}>{formatAmount(r.igstAmount, cur)}</td>
+                  <td className={dClass}>{r.igstRate}%</td>
+                  <td className={dClass}>{formatAmount(r.igstAmount, cur)}</td>
                 </>
               ) : (
                 <>
-                  <td style={d}>{r.cgstRate}%</td>
-                  <td style={d}>{formatAmount(r.cgstAmount, cur)}</td>
-                  <td style={d}>{r.sgstRate}%</td>
-                  <td style={d}>{formatAmount(r.sgstAmount, cur)}</td>
+                  <td className={dClass}>{r.cgstRate}%</td>
+                  <td className={dClass}>{formatAmount(r.cgstAmount, cur)}</td>
+                  <td className={dClass}>{r.sgstRate}%</td>
+                  <td className={dClass}>{formatAmount(r.sgstAmount, cur)}</td>
                 </>
               )}
-              <td style={{ ...d, fontWeight: 700, color: C.ink }}>{formatAmount(r.totalTax, cur)}</td>
+              <td className={`${dClass} font-bold text-[#1e1b2e]`}>{formatAmount(r.totalTax, cur)}</td>
             </tr>
           ))}
-          <tr style={{ background: C.soft }}>
-            <td style={{ ...d, textAlign: "left", fontWeight: 800, color: C.ink }}>Total</td>
-            <td style={{ ...d, fontWeight: 800, color: C.ink }}>{formatAmount(invoice.taxableAmount, cur)}</td>
+          <tr className="bg-[#faf5ff]">
+            <td className={`${dClass} text-left font-extrabold text-[#1e1b2e]`}>Total</td>
+            <td className={`${dClass} font-extrabold text-[#1e1b2e]`}>{formatAmount(invoice.taxableAmount, cur)}</td>
             {igst ? (
               <>
-                <td style={d} />
-                <td style={{ ...d, fontWeight: 800, color: C.ink }}>{formatAmount(invoice.igst, cur)}</td>
+                <td className={dClass} />
+                <td className={`${dClass} font-extrabold text-[#1e1b2e]`}>{formatAmount(invoice.igst, cur)}</td>
               </>
             ) : (
               <>
-                <td style={d} />
-                <td style={{ ...d, fontWeight: 800, color: C.ink }}>{formatAmount(invoice.cgst, cur)}</td>
-                <td style={d} />
-                <td style={{ ...d, fontWeight: 800, color: C.ink }}>{formatAmount(invoice.sgst, cur)}</td>
+                <td className={dClass} />
+                <td className={`${dClass} font-extrabold text-[#1e1b2e]`}>{formatAmount(invoice.cgst, cur)}</td>
+                <td className={dClass} />
+                <td className={`${dClass} font-extrabold text-[#1e1b2e]`}>{formatAmount(invoice.sgst, cur)}</td>
               </>
             )}
-            <td style={{ ...d, fontWeight: 800, color: C.ink }}>{formatAmount(totalTax, cur)}</td>
+            <td className={`${dClass} font-extrabold text-[#1e1b2e]`}>{formatAmount(totalTax, cur)}</td>
           </tr>
         </tbody>
       </table>
-      <div style={{ marginTop: 10, fontSize: 10.5 }}>
-        <span style={{ color: C.muted }}>Total Tax (in words): </span>
-        <strong style={{ color: C.ink }}>{taxInWords(invoice)}</strong>
+      <div className="mt-[10px] text-[10.5px]">
+        <span className="text-[#7a7691]">Total Tax (in words): </span>
+        <strong className="text-[#1e1b2e]">{taxInWords(invoice)}</strong>
       </div>
     </div>
   );
@@ -575,28 +565,28 @@ function taxInWords(invoice: Invoice): string {
 
 /* ------------------------------ footer ------------------------------ */
 
-function Footer({ invoice, page, total }: { invoice: Invoice; page: number; total: number }) {
-  return (
-    <div
-      style={{
-        position: "absolute",
-        left: PAGE_PADDING_X,
-        right: PAGE_PADDING_X,
-        bottom: 20,
-        paddingTop: 8,
-        borderTop: `1px solid ${C.rule}`,
-        display: "flex",
-        justifyContent: "space-between",
-        fontSize: 9.5,
-        color: C.muted,
-      }}
-    >
-      <span>
-        {invoice.invoiceNumber} · {invoice.customer.customerName || "—"}
-      </span>
-      <span>
-        Page {page} of {total}
-      </span>
-    </div>
-  );
-}
+// function Footer({ invoice, page, total }: { invoice: Invoice; page: number; total: number }) {
+//   return (
+//     <div
+//       style={{
+//         position: "absolute",
+//         left: PAGE_PADDING_X,
+//         right: PAGE_PADDING_X,
+//         bottom: 20,
+//         paddingTop: 8,
+//         borderTop: `1px solid ${C.rule}`,
+//         display: "flex",
+//         justifyContent: "space-between",
+//         fontSize: 9.5,
+//         color: C.muted,
+//       }}
+//     >
+//       <span>
+//         {invoice.invoiceNumber} · {invoice.customer.customerName || "—"}
+//       </span>
+//       <span>
+//         Page {page} of {total}
+//       </span>
+//     </div>
+//   );
+// }

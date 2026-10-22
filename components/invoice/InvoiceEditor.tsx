@@ -125,7 +125,7 @@ export default function InvoiceEditor({ initial, mode, backHref, onSaved }: Prop
               <Button type="text" shape="circle" icon={<ArrowLeftOutlined />} aria-label="Back" />
             </Link>
             <div className="hidden min-w-0 sm:block">
-              <h1 className="m-0 truncate font-[family-name:var(--font-display)] text-[17px] font-extrabold leading-tight text-slate-900">
+              <h1 className="m-0 truncate font-(family-name:--font-display) text-[17px] font-extrabold leading-tight text-slate-900">
                 {mode === "create" ? "New invoice" : "Edit invoice"}
               </h1>
               <p className="m-0 truncate text-xs text-slate-500">{invoice.invoiceNumber || "No number yet"}</p>

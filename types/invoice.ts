@@ -25,7 +25,7 @@ export interface Business extends Address {
   email?: string;
   phone?: string;
   website?: string;
-  logoDataUrl?: string; // base64 image stored client-side
+  logoDataUrl?: string;
 }
 
 export interface Customer extends Address {

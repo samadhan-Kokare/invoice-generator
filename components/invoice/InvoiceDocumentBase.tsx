@@ -300,7 +300,7 @@ function ItemsTable({ invoice, page }: { invoice: Invoice; page: InvoicePage }) 
           <th className={`${thClass} text-right`}>GST</th>
           {/* <th style={{ ...th, textAlign: "right" }}>Qty</th> */}
           <th className={`${thClass} text-right`}>Rate</th>
-          <th className={`${thClass} text-right`}>Discount</th>
+          <th className={`${thClass} text-right`}>Taxable Value</th>
           {igst ? (
             <th className={`${thClass} text-right`}>IGST</th>
           ) : (
@@ -364,7 +364,7 @@ function Closing({ invoice }: { invoice: Invoice }) {
 
         <div className="w-[270px] shrink-0 bg-[#faf5ff] border border-[#e9d5ff] rounded-xl p-[12px_16px]">
           <TotalRow label="Sub Total Amount" value={formatCurrency(invoice.subtotal, cur)} />
-          <TotalRow label="Taxable Amount" value={formatCurrency(invoice.taxableAmount, cur)} />
+          <TotalRow label="Taxable Value" value={formatCurrency(invoice.taxableAmount, cur)} />
           {invoice.totalDiscount > 0 && <TotalRow label="Discount" value={`− ${formatCurrency(invoice.totalDiscount, cur)}`} />}
           {igst ? (
             <TotalRow label="IGST" value={formatCurrency(invoice.igst, cur)} />

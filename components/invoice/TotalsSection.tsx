@@ -31,7 +31,7 @@ export default function TotalsSection({ invoice, onChange }: Props) {
 
         <div className="num rounded-xl border border-purple-100 bg-white p-4 text-sm">
           <Row label="Subtotal" value={formatCurrency(invoice.subtotal, cur)} />
-          {invoice.totalDiscount > 0 && <Row label="Discount" value={`− ${formatCurrency(invoice.totalDiscount, cur)}`} />}
+          {invoice.totalDiscount > 0 && <Row label="Taxable value" value={`− ${formatCurrency(invoice.totalDiscount, cur)}`} />}
           <Row label="Taxable amount" value={formatCurrency(invoice.taxableAmount, cur)} />
           {igst ? (
             <Row label="IGST" value={formatCurrency(invoice.igst, cur)} />
